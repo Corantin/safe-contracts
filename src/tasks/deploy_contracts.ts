@@ -14,15 +14,16 @@ const contracts = {
     SignMessageLib: "contracts/libraries/SignMessageLib.sol:SignMessageLib",
     Safe: "contracts/Safe.sol:Safe",
     SafeL2: "contracts/SafeL2.sol:SafeL2",
+    HoneyTestToken: "contracts/test/HoneyTestToken.sol:HoneyTestToken",
 };
 
 task("deploy-contracts", "Deploys and verifies Safe contracts").setAction(async (_, hre) => {
-    // console.log("Deploying contracts");
-    // await hre.run("deploy");
-    // console.log("Local contracts verification");
-    // await hre.run("local-verify");
-    // console.log("Souricing contracts");
-    // await hre.run("sourcify");
+    console.log("Deploying contracts");
+    await hre.run("deploy", "--tags honey-test-token");
+    console.log("Local contracts verification");
+    await hre.run("local-verify");
+    console.log("Sourcifying contracts");
+    await hre.run("sourcify");
     if (hre.network.zksync) {
         for (const contractName of Object.keys(contracts)) {
             try {
@@ -36,7 +37,12 @@ task("deploy-contracts", "Deploys and verifies Safe contracts").setAction(async 
                     contract: fullyQualifiedContractName,
                     constructorArguments: contractJson.args,
                 });
-                console.log("Verified", contractName, "with address", contractJson.address);
+                const isMainnet = hre.network.name !== "zkSyncTestnet";
+                console.log(
+                    "Verified",
+                    contractName,
+                    `https://${isMainnet ? "" : "goerli"}.explorer.zksync.io/address/${contractJson.address}`,
+                );
             } catch (error) {
                 console.error("Error verifying", contractName, error);
             }
