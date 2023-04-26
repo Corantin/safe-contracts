@@ -1,17 +1,22 @@
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import deployZkSync from "../utils/deploy-zksync";
 
 const deploy: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const { deployments, getNamedAccounts } = hre;
     const { deployer } = await getNamedAccounts();
     const { deploy } = deployments;
 
-    await deploy("SafeProxyFactory", {
-        from: deployer,
-        args: [],
-        log: true,
-        deterministicDeployment: true,
-    });
+    if (hre.network.zksync) {
+        await deployZkSync(hre, "SafeProxyFactory", []);
+    } else {
+        await deploy("SafeProxyFactory", {
+            from: deployer,
+            args: [],
+            log: true,
+            deterministicDeployment: true,
+        });
+    }
 };
 
 deploy.tags = ["factory", "l2-suite", "main-suite"];

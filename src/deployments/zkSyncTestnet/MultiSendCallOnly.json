@@ -1,0 +1,19 @@
+{
+  "address": "0x421f39f9CC939F5A53a7Abf192FF384a4b03F2e3",
+  "args": [],
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "transactions",
+          "type": "bytes"
+        }
+      ],
+      "name": "multiSend",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    }
+  ]
+}

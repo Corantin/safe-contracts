@@ -12,5 +12,14 @@ module.exports = {
         sourceType: "module",
     },
     plugins: ["@typescript-eslint", "no-only-tests"],
-    rules: {},
+    rules: {
+        "linebreak-style": ["error", "windows"],
+        "prettier/prettier": [
+            "error",
+            {
+                endOfLine: "auto",
+            },
+        ],
+        "@typescript-eslint/no-non-null-assertion": "off",
+    },
 };

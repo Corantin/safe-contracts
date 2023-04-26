@@ -6,6 +6,9 @@ import "hardhat-deploy";
 import dotenv from "dotenv";
 import yargs from "yargs";
 import { getSingletonFactoryInfo } from "@gnosis.pm/safe-singleton-factory";
+import "@matterlabs/hardhat-zksync-deploy";
+import "@matterlabs/hardhat-zksync-solc";
+import "@matterlabs/hardhat-zksync-verify";
 
 const argv = yargs
     .option("network", {
@@ -41,7 +44,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { DeterministicDeploymentInfo } from "hardhat-deploy/dist/types";
 
 const primarySolidityVersion = SOLIDITY_VERSION || "0.7.6";
-const soliditySettings = !!SOLIDITY_SETTINGS ? JSON.parse(SOLIDITY_SETTINGS) : undefined;
+const soliditySettings = SOLIDITY_SETTINGS ? JSON.parse(SOLIDITY_SETTINGS) : undefined;
 
 const deterministicDeployment = (network: string): DeterministicDeploymentInfo => {
     const info = getSingletonFactoryInfo(parseInt(network));
@@ -74,10 +77,12 @@ const userConfig: HardhatUserConfig = {
             allowUnlimitedContractSize: true,
             blockGasLimit: 100000000,
             gas: 100000000,
+            zksync: false,
         },
         mainnet: {
             ...sharedNetworkConfig,
             url: `https://mainnet.infura.io/v3/${INFURA_KEY}`,
+            zksync: false,
         },
         gnosis: {
             ...sharedNetworkConfig,
@@ -86,40 +91,58 @@ const userConfig: HardhatUserConfig = {
         ewc: {
             ...sharedNetworkConfig,
             url: `https://rpc.energyweb.org`,
+            zksync: false,
         },
         goerli: {
             ...sharedNetworkConfig,
             url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
+            zksync: false,
         },
         mumbai: {
             ...sharedNetworkConfig,
             url: `https://polygon-mumbai.infura.io/v3/${INFURA_KEY}`,
+            zksync: false,
         },
         polygon: {
             ...sharedNetworkConfig,
             url: `https://polygon-mainnet.infura.io/v3/${INFURA_KEY}`,
+            zksync: false,
         },
         volta: {
             ...sharedNetworkConfig,
             url: `https://volta-rpc.energyweb.org`,
+            zksync: false,
         },
         bsc: {
             ...sharedNetworkConfig,
             url: `https://bsc-dataseed.binance.org/`,
+            zksync: false,
         },
         arbitrum: {
             ...sharedNetworkConfig,
             url: `https://arb1.arbitrum.io/rpc`,
+            zksync: false,
         },
         fantomTestnet: {
             ...sharedNetworkConfig,
             url: `https://rpc.testnet.fantom.network/`,
+            zksync: false,
         },
         avalanche: {
             ...sharedNetworkConfig,
             url: `https://api.avax.network/ext/bc/C/rpc`,
+            zksync: false,
+        },
+        zkSyncTestnet: {
+            ...sharedNetworkConfig,
+            url: `https://testnet.era.zksync.dev`,
+            ethNetwork: "https://eth-goerli.g.alchemy.com/v2/pDaL8AO_7homOC45AOHMTPMLUYjVoZa4",
+            zksync: true,
+            // Verification endpoint for Goerli
+            verifyURL: "https://zksync2-testnet-explorer.zksync.dev/contract_verification",
         },
     },
+    defaultNetwork: "zkSyncTestnet",
     deterministicDeployment,
     namedAccounts: {
         deployer: 0,
@@ -130,9 +153,14 @@ const userConfig: HardhatUserConfig = {
     etherscan: {
         apiKey: ETHERSCAN_API_KEY,
     },
+    zksolc: {
+        version: "1.3.8",
+        compilerSource: "binary",
+        settings: {},
+    },
 };
 if (NODE_URL) {
-    userConfig.networks!!.custom = {
+    userConfig.networks!.custom = {
         ...sharedNetworkConfig,
         url: NODE_URL,
     };
